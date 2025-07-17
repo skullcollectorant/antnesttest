@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蚁巢水塔评价体系计算器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --earth-brown: #8D6E63;
+            --deep-green: #2E7D32;
+            --honey-yellow: #FFEB3B;
+            --dark-brown: #5D4037;
+            --light-brown: #D7CCC8;
+            --accent-green: #66BB6A;
+            --accent-yellow: #FFD54F;
+            --light-yellow: #FFF9C4;
+            --bone-white: #F5F5F5;
+            --shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark-brown), var(--deep-green));
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.05"><path d="M30,20 Q40,15 50,20 T70,20 Q80,25 70,30 T50,40 Q40,45 30,40 T20,30 Q20,25 30,20Z" fill="white"/></svg>');
+            background-size: 80px;
+            z-index: -1;
+            opacity: 0.1;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .disclaimer-banner {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid var(--honey-yellow);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+            color: var(--dark-brown);
+            font-size: 1.1rem;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+        
+        .disclaimer-banner i {
+            color: var(--deep-green);
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .bone-decoration {
+            position: absolute;
+            font-size: 1.2rem;
+            color: var(--bone-white);
+            opacity: 0.5;
+            z-index: -1;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            color: white;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid var(--honey-yellow);
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 Q50,20 100,0 L100,100 Q50,80 0,100 Z" fill="rgba(255,255,255,0.05)"/></svg>');
+            background-size: cover;
+            z-index: -1;
+        }
+        
+        .beetle-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--honey-yellow);
+            animation: beetleMove 3s infinite alternate;
+        }
+        
+        @keyframes beetleMove {
+            0% { transform: translateX(0) rotate(0deg); }
+            50% { transform: translateX(20px) rotate(5deg); }
+            100% { transform: translateX(0) rotate(0deg); }
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            color: var(--honey-yellow);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            color: var(--light-brown);
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .tab-btn {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            border: 2px solid var(--earth-brown);
+        }
+        
+        .tab-btn.active {
+            background: var(--earth-brown);
+            color: var(--light-yellow);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .tab-content {
+            display: none;
+            background: var(--light-brown);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid var(--earth-brown);
+            position: relative;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-title {
+            background: linear-gradient(to right, var(--earth-brown), var(--deep-green));
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 5px solid var(--honey-yellow);
+        }
+        
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark-brown);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .input-group label i {
+            color: var(--deep-green);
+        }
+        
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--earth-brown);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .input-group input:focus, .input-group select:focus {
+            border-color: var(--deep-green);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            gap: 10px;
+        }
+        
+        .checkbox-group input {
+            width: auto;
+        }
+        
+        .ventilation-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 10px 0;
+        }
+        
+        .ventilation-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 8px;
+            border: 1px solid var(--earth-brown);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .ventilation-option:hover {
+            background: rgba(255,255,255,0.8);
+        }
+        
+        .ventilation-option.selected {
+            background: var(--deep-green);
+            color: white;
+            border-color: var(--dark-brown);
+        }
+        
+        .btn-calculate {
+            background: linear-gradient(to right, var(--earth-brown), var(--deep-green));
+            color: var(--light-yellow);
+            border: none;
+            padding: 16px 30px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            border: 2px solid var(--honey-yellow);
+        }
+        
+        .btn-calculate:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(0,0,0,0.2);
+            background: linear-gradient(to right, var(--deep-green), var(--earth-brown));
+        }
+        
+        .info-tooltip {
+            font-size: 0.9rem;
+            color: var(--dark-brown);
+            background: var(--light-yellow);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 5px;
+            border-left: 3px solid var(--honey-yellow);
+        }
+        
+        .info-tooltip i {
+            color: var(--deep-green);
+            margin-right: 5px;
+        }
+        
+        .disclaimer {
+            background: var(--light-yellow);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid var(--honey-yellow);
+            font-size: 0.9rem;
+            color: var(--dark-brown);
+            text-align: center;
+        }
+        
+        .results-section {
+            background: var(--light-brown);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+            margin-top: 30px;
+            border: 2px solid var(--earth-brown);
+            position: relative;
+        }
+        
+        .results-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .result-card {
+            background: linear-gradient(to bottom right, white, var(--light-yellow));
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid var(--deep-green);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        
+        .result-title {
+            color: var(--dark-brown);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .result-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 15px 0;
+            color: var(--deep-green);
+        }
+        
+        .result-description {
+            color: var(--dark-brown);
+            line-height: 1.6;
+            font-size: 1rem;
+            padding-top: 10px;
+            border-top: 1px dashed var(--earth-brown);
+        }
+        
+        .category-header {
+            grid-column: 1 / -1;
+            background: linear-gradient(to right, var(--earth-brown), var(--deep-green));
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 5px solid var(--honey-yellow);
+        }
+        
+        .evaluation-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--deep-green);
+            color: var(--light-yellow);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .beetle-decoration {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 1.5rem;
+            color: var(--earth-brown);
+            opacity: 0.3;
+        }
+        
+        .bone-decoration {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            font-size: 1.5rem;
+            color: var(--bone-white);
+            opacity: 0.3;
+            transform: rotate(45deg);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--light-brown);
+            margin-top: 40px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            position: relative;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .signature {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .signature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tab-btn {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+            
+            .signature {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 骨头装饰元素 -->
+    <div class="bone-decoration" style="top: 100px; left: 5%; font-size: 2rem;">
+        <i class="fas fa-bone"></i>
+    </div>
+    <div class="bone-decoration" style="top: 300px; right: 5%; font-size: 1.8rem; transform: rotate(-20deg);">
+        <i class="fas fa-bone"></i>
+    </div>
+    <div class="bone-decoration" style="top: 500px; left: 10%; font-size: 1.5rem; transform: rotate(70deg);">
+        <i class="fas fa-bone"></i>
+    </div>
+    
+    <div class="container">
+        <!-- 顶部声明 -->
+        <div class="disclaimer-banner">
+            <i class="fas fa-exclamation-triangle"></i> 
+            本方案为蚁巢间横向对比方案，部分数据为正比例处理后相对数值，并无绝对意义
+        </div>
+        
+        <header>
+            <div class="beetle-icon">
+                <i class="fas fa-beetle"></i>
+            </div>
+            <h1><i class="fas fa-archway"></i> 蚁巢水塔评价体系计算器</h1>
+            <p class="subtitle">输入您的蚁巢参数，系统将自动计算水塔类和空间类评价指标，并提供相对化评估结果</p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="water-tower">
+                <i class="fas fa-water"></i> 水塔类参数
+            </button>
+            <button class="tab-btn" data-tab="space">
+                <i class="fas fa-vector-square"></i> 空间类参数
+            </button>
+        </div>
+        
+        <div class="tab-content active" id="water-tower-tab">
+            <div class="section-title">
+                <i class="fas fa-water"></i> 水塔类参数输入
+            </div>
+            
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="moistureArea"><i class="fas fa-ruler-combined"></i> 保湿区面积 (cm²)</label>
+                    <input type="number" id="moistureArea" placeholder="输入保湿区面积" value="150">
+                </div>
+                
+                <div class="input-group">
+                    <label for="totalArea"><i class="fas fa-border-all"></i> 总面积 (cm²)</label>
+                    <input type="number" id="totalArea" placeholder="输入总面积" value="200">
+                </div>
+                
+                <div class="input-group">
+                    <label for="ventilationArea"><i class="fas fa-wind"></i> 通风面积 (cm²)</label>
+                    <input type="number" id="ventilationArea" placeholder="输入通风面积" value="15">
+                </div>
+                
+                <div class="input-group">
+                    <label for="projectionArea"><i class="fas fa-crop-alt"></i> 总投影表面积 (cm²)</label>
+                    <input type="number" id="projectionArea" placeholder="输入总投影表面积" value="200">
+                    <div class="info-tooltip">
+                        <i class="fas fa-info-circle"></i> 投影面积指不计算墙体表面积，只计算水平表面积或圆形下50%部分的表面积
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="waterVolume"><i class="fas fa-flask"></i> 水箱体积 (cm³)</label>
+                    <input type="number" id="waterVolume" placeholder="输入水箱体积" value="500">
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-fan"></i> 通风类型</label>
+                    <div class="info-tooltip">
+                        <i class="fas fa-info-circle"></i> 请选择通风方向和铁丝网覆盖情况
+                    </div>
+                    
+                    <div class="ventilation-group">
+                        <div class="ventilation-option" data-type="none">
+                            <input type="radio" name="ventilationType" id="vent-none" checked>
+                            <label for="vent-none">无通风口</label>
+                        </div>
+                        <div class="ventilation-option" data-type="single">
+                            <input type="radio" name="ventilationType" id="vent-single">
+                            <label for="vent-single">单侧通风</label>
+                        </div>
+                        <div class="ventilation-option" data-type="double">
+                            <input type="radio" name="ventilationType" id="vent-double">
+                            <label for="vent-double">双侧通风</label>
+                        </div>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="wireMesh" disabled>
+                        <label for="wireMesh">铁丝网覆盖通风孔</label>
+                    </div>
+                </div>
+                
+                <div class="input-group" style="grid-column: 1 / -1;">
+                    <label><i class="fas fa-tools"></i> 维护简易度加分项</label>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="replaceable" checked>
+                        <label for="replaceable">水塔可替换拆开 (+10分)</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="silicone" checked>
+                        <label for="silicone">有硅胶注射防水口 (+5分)</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="wireReplaceable">
+                        <label for="wireReplaceable">铁丝网可替换 (+5分)</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="disclaimer">
+                <i class="fas fa-exclamation-circle"></i> 声明：此评价项目仅针对空气水塔系统
+            </div>
+        </div>
+        
+        <div class="tab-content" id="space-tab">
+            <div class="section-title">
+                <i class="fas fa-vector-square"></i> 空间类参数输入
+            </div>
+            
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="activityArea"><i class="fas fa-running"></i> 活动区面积 (cm²)</label>
+                    <input type="number" id="activityArea" placeholder="输入活动区面积" value="300">
+                </div>
+                
+                <div class="input-group">
+                    <label for="nestArea"><i class="fas fa-home"></i> 巢区面积 (cm²)</label>
+                    <input type="number" id="nestArea" placeholder="输入巢区面积" value="200">
+                </div>
+                
+                <div class="input-group">
+                    <label for="minPassageWidth"><i class="fas fa-arrows-alt-h"></i> 最小通道宽度 (cm)</label>
+                    <input type="number" id="minPassageWidth" placeholder="输入最小通道宽度" value="0.8" step="0.1">
+                </div>
+                
+                <div class="input-group">
+                    <label for="minNestArea"><i class="fas fa-vector-square"></i> 最小巢室投影面积 (cm²)</label>
+                    <input type="number" id="minNestArea" placeholder="输入最小巢室投影面积" value="5">
+                    <div class="info-tooltip">
+                        <i class="fas fa-info-circle"></i> 投影面积指不计算墙体表面积，只计算水平表面积或圆形下50%部分的表面积
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="antLength"><i class="fas fa-ruler"></i> 蚂蚁长度 (cm)</label>
+                    <input type="number" id="antLength" placeholder="输入蚂蚁长度" value="1.0" step="0.1">
+                </div>
+                
+                <div class="input-group">
+                    <label for="antWidth"><i class="fas fa-ruler-vertical"></i> 蚂蚁宽度 (cm)</label>
+                    <input type="number" id="antWidth" placeholder="输入蚂蚁宽度" value="0.3" step="0.1">
+                </div>
+                
+                <div class="input-group">
+                    <label for="totalNestArea"><i class="fas fa-border-style"></i> 巢室总面积 (cm²)</label>
+                    <input type="number" id="totalNestArea" placeholder="输入巢室总面积" value="150">
+                </div>
+            </div>
+        </div>
+        
+        <button id="calculateBtn" class="btn-calculate">
+            <i class="fas fa-calculator"></i> 计算蚁巢评价结果
+        </button>
+        
+        <div class="results-section">
+            <div class="category-header">
+                <i class="fas fa-tint"></i> 水塔类评价结果
+            </div>
+            
+            <div class="results-container">
+                <div class="result-card">
+                    <div class="result-title">
+                        <i class="fas fa-tint"></i> 保湿强度 (Ws)
+                    </div>
+                    <div class="result-value" id="wsResult">0.75</div>
+                    <div class="result-description">
+                        计算公式：Ws = 保湿区面积 / 总面积 (cm²/cm²)
+                        <p>值越高表示保湿能力越强</p>
+                    </div>
+                    <div class="evaluation-badge">良好</div>
+                    <div class="beetle-decoration">
+                        <i class="fas fa-beetle"></i>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-title">
+                        <i class="fas fa-wind"></i> 通风度常数 (K)
+                    </div>
+                    <div class="result-value" id="kResult">0.20</div>
+                    <div class="result-description">
+                        计算公式：K = (A/S * 系数) * 1000 + 0.2
+                        <p>反映水塔通风能力</p>
+                    </div>
+                    <div class="evaluation-badge">低</div>
+                    <div class="beetle-decoration">
+                        <i class="fas fa-beetle"></i>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-title">
+                        <i class="fas fa-hourglass-half"></i> 保湿持久度 (Wt)
+                    </div>
+                    <div class="result-value" id="wtResult">12.50 cm</div>
+                    <div class="result-description">
+                        计算公式：Wt = V水箱 / (S面积 × K)
+                        <p>值越高表示保湿时间越长</p>
+                    </div>
+                    <div class="evaluation-badge">优秀</div>
+                    <div class="beetle-decoration">
+                        <i class="fas fa-beetle"></i>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-title">
+                        <i class="fas fa-tools"></i> 维护简易度
+                    </div>
+                    <div class="result-value" id="maintenanceResult">90 分</div>
+                    <div class="result-description">
+                        <p>基础评分：75分 + 加分项</p>
+                        <p>可替换拆开: +10分</p>
+                        <p>硅胶防水口: +5分</p>
+                        <p>铁丝网可替换: +0分</p>
+                    </div>
+                    <div class="evaluation-badge">优秀</div>
+                    <div class="beetle-decoration">
+                        <i class="fas fa-beetle"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="category-header">
+                <i class="fas fa-vector-square"></i> 空间类评价结果
+            </div>
+            
+            <div class="results-container">
+                <div class="result-card">
+                    <div class="result-title">
+                        <i class="fas fa-expand-arrows-alt"></i> 巢区活动区比例
+                    </div>
+                    <div class="result-value" id="activityRatio">1.50</div>
+                    <div class="result-description">
+                        计算公式：活动区面积 / 巢区面积 (cm²/cm²)
+                        <p>反映活动空间与巢室空间的比例关系</p>
+                    </div>
+                    <div class="evaluation-badge">优秀</div>
+                    <div class="bone-decoration">
+                        <i class="fas fa-bone"></i>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-title">
+                        <i class="fas fa-arrows-alt-h"></i> 最小通道宽度
+                    </div>
+                    <div class="result-value" id="passageWidth">0.80 cm</div>
+                    <div class="result-description">
+                        直接输入值，无需计算
+                        <p>确保蚂蚁能自由通行的重要指标</p>
+                    </div>
+                    <div class="evaluation-badge">良好</div>
+                    <div class="bone-decoration">
+                        <i class="fas fa-bone"></i>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-title">
+                        <i class="fas fa-user-friends"></i> 最小建议入住数
+                    </div>
+                    <div class="result-value" id="minAnts">33</div>
+                    <div class="result-description">
+                        计算公式：最小巢室面积 / (蚂蚁长度 × 宽度 × 5)
+                        <p>巢室能容纳的最小蚂蚁数量</p>
+                    </div>
+                    <div class="evaluation-badge">中等</div>
+                    <div class="bone-decoration">
+                        <i class="fas fa-bone"></i>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-title">
+                        <i class="fas fa-warehouse"></i> 巢室容量
+                    </div>
+                    <div class="result-value" id="capacity">500</div>
+                    <div class="result-description">
+                        计算公式：巢室总面积 / (蚂蚁长度 × 宽度 × F)
+                        <p>根据蚂蚁尺寸计算的巢室总容量</p>
+                    </div>
+                    <div class="evaluation-badge">充足</div>
+                    <div class="bone-decoration">
+                        <i class="fas fa-bone"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>蚁巢空间评价体系计算器 | 相对化养蚁工具 | 数据仅供参考</p>
+            
+            <div class="signature">
+                <div class="signature-item">
+                    <i class="fas fa-laptop-code"></i> HMTL编码：DeepSeek-R1
+                </div>
+                <div class="signature-item">
+                    <i class="fas fa-bone"></i>算法参数及修bug：头盖骨收获蚁
+                </div>
+            </div>
+            
+            <div class="bone-decoration" style="bottom: 10px; left: 20px; font-size: 1.5rem;">
+                <i class="fas fa-bone"></i>
+            </div>
+            <div class="bone-decoration" style="bottom: 30px; right: 20px; font-size: 1.2rem; transform: rotate(45deg);">
+                <i class="fas fa-bone"></i>
+            </div>
+        </footer>
+    </div>
+    
+    <script>
+        // 标签切换功能
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // 移除所有标签的活动状态
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // 隐藏所有标签内容
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // 激活当前标签
+                button.classList.add('active');
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+        
+        // 通风类型选择功能
+        document.querySelectorAll('.ventilation-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const type = this.getAttribute('data-type');
+                
+                // 移除所有选择
+                document.querySelectorAll('.ventilation-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // 添加当前选择
+                this.classList.add('selected');
+                
+                // 设置对应的radio为选中
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+                
+                // 更新铁丝网选项状态
+                const wireMeshCheckbox = document.getElementById('wireMesh');
+                if (type === 'none') {
+                    wireMeshCheckbox.disabled = true;
+                    wireMeshCheckbox.checked = false;
+                } else {
+                    wireMeshCheckbox.disabled = false;
+                }
+            });
+        });
+        
+        // 初始选择无通风口
+        document.querySelector('.ventilation-option[data-type="none"]').classList.add('selected');
+        
+        // 计算结果功能
+        document.getElementById('calculateBtn').addEventListener('click', calculateResults);
+        
+        function calculateResults() {
+            // 获取水塔类参数
+            const moistureArea = parseFloat(document.getElementById('moistureArea').value) || 0;
+            const totalArea = parseFloat(document.getElementById('totalArea').value) || 1;
+            const ventilationArea = parseFloat(document.getElementById('ventilationArea').value) || 0;
+            const projectionArea = parseFloat(document.getElementById('projectionArea').value) || 1;
+            const waterVolume = parseFloat(document.getElementById('waterVolume').value) || 0;
+            const isReplaceable = document.getElementById('replaceable').checked;
+            const hasSilicone = document.getElementById('silicone').checked;
+            const wireReplaceable = document.getElementById('wireReplaceable').checked;
+            
+            // 获取通风类型
+            const ventilationType = document.querySelector('input[name="ventilationType"]:checked').parentElement.getAttribute('data-type');
+            const hasWireMesh = document.getElementById('wireMesh').checked;
+            
+            // 计算水塔类指标
+            // 1. 保湿强度 (Ws)
+            const ws = moistureArea / totalArea;
+            document.getElementById('wsResult').textContent = ws.toFixed(2);
+            
+            // 2. 通风度常数 (K)
+            let kb = ventilationArea / projectionArea;
+            let adjustmentFactor = 1;
+            
+            // 通风方向系数
+            if (ventilationType === 'single') {
+                adjustmentFactor = 1;
+            } else if (ventilationType === 'double') {
+                adjustmentFactor = 1.8;
+            } else if (ventilationType === 'none') {
+                adjustmentFactor = 0;
+            }
+            
+            // 铁丝网系数
+            if (hasWireMesh && ventilationType !== 'none') {
+                adjustmentFactor *= 0.7;
+            }
+            
+            const k = ventilationType === 'none' ? 0.2 : (kb * adjustmentFactor * 1000) + 0.2;
+            document.getElementById('kResult').textContent = k.toFixed(2);
+            
+            // 3. 保湿持久度 (Wt)
+            const wt = waterVolume / (projectionArea * k) || 0;
+            document.getElementById('wtResult').textContent = wt.toFixed(2) + ' cm';
+            
+            // 4. 维护简易度
+            const baseMaintenance = 75;
+            let bonus = 0;
+            let bonusHtml = '';
+            
+            if (isReplaceable) {
+                bonus += 10;
+                bonusHtml += `<p>可替换拆开: +10分</p>`;
+            }
+            if (hasSilicone) {
+                bonus += 5;
+                bonusHtml += `<p>硅胶防水口: +5分</p>`;
+            }
+            if (wireReplaceable && hasWireMesh && ventilationType !== 'none') {
+                bonus += 5;
+                bonusHtml += `<p>铁丝网可替换: +5分</p>`;
+            } else {
+                bonusHtml += `<p>铁丝网可替换: +0分</p>`;
+            }
+            
+            const maintenanceScore = baseMaintenance + bonus;
+            document.getElementById('maintenanceResult').textContent = maintenanceScore + ' 分';
+            document.querySelector('.result-card .result-description').innerHTML = 
+                `<p>基础评分：75分 + 加分项</p>${bonusHtml}`;
+            
+            // 获取空间类参数
+            const activityArea = parseFloat(document.getElementById('activityArea').value) || 0;
+            const nestArea = parseFloat(document.getElementById('nestArea').value) || 1;
+            const minPassageWidth = parseFloat(document.getElementById('minPassageWidth').value) || 0;
+            const minNestArea = parseFloat(document.getElementById('minNestArea').value) || 0;
+            const antLength = parseFloat(document.getElementById('antLength').value) || 0.1;
+            const antWidth = parseFloat(document.getElementById('antWidth').value) || 0.1;
+            const totalNestArea = parseFloat(document.getElementById('totalNestArea').value) || 0;
+            
+            // 计算空间类指标
+            // 1. 巢区活动区比例
+            const activityRatio = activityArea / nestArea;
+            document.getElementById('activityRatio').textContent = activityRatio.toFixed(2);
+            
+            // 2. 最小通道宽度
+            document.getElementById('passageWidth').textContent = minPassageWidth.toFixed(2) + ' cm';
+            
+            // 3. 最小建议入住数
+            const minAnts = minNestArea / (antLength * antWidth * 5);
+            document.getElementById('minAnts').textContent = Math.floor(minAnts);
+            
+            // 4. 巢室容量
+            let fFactor = 0.3;
+            if (antLength >= 0.5 && antLength < 1.2) fFactor = 0.7;
+            else if (antLength >= 1.2 && antLength < 2) fFactor = 1;
+            else if (antLength >= 2 && antLength < 4.2) fFactor = 1.5;
+            
+            const capacity = totalNestArea / (antLength * antWidth * fFactor);
+            document.getElementById('capacity').textContent = Math.floor(capacity);
+            
+            // 更新评价徽章
+            updateEvaluationBadges(ws, k, wt, activityRatio, minPassageWidth, minAnts, capacity);
+        }
+        
+        function updateEvaluationBadges(ws, k, wt, activityRatio, minPassageWidth, minAnts, capacity) {
+            // 更新水塔类评价
+            document.querySelectorAll('.result-card .evaluation-badge').forEach(badge => {
+                const title = badge.parentElement.querySelector('.result-title').textContent;
+                
+                if (title.includes('保湿强度')) {
+                    badge.textContent = ws > 0.7 ? '优秀' : ws > 0.5 ? '良好' : '一般';
+                    badge.style.background = ws > 0.7 ? '#2E7D32' : ws > 0.5 ? '#66BB6A' : '#FFD54F';
+                }
+                else if (title.includes('通风度常数')) {
+                    if (k <= 0.2) {
+                        badge.textContent = '无通风';
+                        badge.style.background = '#8D6E63';
+                    } else if (k <= 1.2) {
+                        badge.textContent = '低';
+                        badge.style.background = '#FFD54F';
+                    } else if (k <= 1.4) {
+                        badge.textContent = '中';
+                        badge.style.background = '#66BB6A';
+                    } else if (k <= 5.2) {
+                        badge.textContent = '高';
+                        badge.style.background = '#2E7D32';
+                    } else {
+                        badge.textContent = '极高';
+                        badge.style.background = '#8D6E63';
+                    }
+                }
+                else if (title.includes('保湿持久度')) {
+                    badge.textContent = wt > 3 ? '优秀' : wt > 1.5 ? '良好' : '一般';
+                    badge.style.background = wt > 3 ? '#2E7D32' : wt > 1.5 ? '#66BB6A' : '#FFD54F';
+                }
+                else if (title.includes('维护简易度')) {
+                    // 维护简易度使用固定值
+                }
+                // 空间类评价
+                else if (title.includes('巢区活动区比例')) {
+                    badge.textContent = activityRatio > 1.2 ? '优秀' : activityRatio > 0.8 ? '良好' : '一般';
+                    badge.style.background = activityRatio > 1.2 ? '#2E7D32' : activityRatio > 0.8 ? '#66BB6A' : '#FFD54F';
+                }
+                else if (title.includes('最小通道宽度')) {
+                    badge.textContent = minPassageWidth > 1.0 ? '宽敞' : minPassageWidth > 0.7 ? '良好' : '狭窄';
+                    badge.style.background = minPassageWidth > 1.0 ? '#2E7D32' : minPassageWidth > 0.7 ? '#66BB6A' : '#8D6E63';
+                }
+                else if (title.includes('最小建议入住数')) {
+                    // 根据要求：数值越小越好，3为优秀
+                    if (minAnts <= 3) {
+                        badge.textContent = '优秀';
+                        badge.style.background = '#2E7D32';
+                    } else if (minAnts <= 5) {
+                        badge.textContent = '良好';
+                        badge.style.background = '#66BB6A';
+                    } else if (minAnts <= 10) {
+                        badge.textContent = '中等';
+                        badge.style.background = '#FFD54F';
+                    } else {
+                        badge.textContent = '不足';
+                        badge.style.background = '#8D6E63';
+                    }
+                }
+                else if (title.includes('巢室容量')) {
+                    badge.textContent = capacity > 500 ? '超大' : capacity > 300 ? '充足' : capacity > 100 ? '适中' : '不足';
+                    badge.style.background = capacity > 500 ? '#2E7D32' : capacity > 300 ? '#66BB6A' : capacity > 100 ? '#FFD54F' : '#8D6E63';
+                }
+            });
+        }
+        
+        // 初始计算
+        calculateResults();
+    </script>
+</body>
+</html>
