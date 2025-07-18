@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>蚁巢水塔评价体系计算器</title>
+    <title>蚁巢空间评价体系计算器</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -468,6 +468,12 @@
             border-radius: 30px;
         }
         
+        .important-input {
+            background: rgba(255, 255, 220, 0.8) !important;
+            border: 2px solid var(--accent-yellow) !important;
+            box-shadow: 0 0 8px rgba(255, 213, 79, 0.5);
+        }
+        
         @media (max-width: 768px) {
             h1 {
                 font-size: 2.2rem;
@@ -512,7 +518,7 @@
             <div class="beetle-icon">
                 <i class="fas fa-beetle"></i>
             </div>
-            <h1><i class="fas fa-archway"></i> 蚁巢水塔评价体系计算器</h1>
+            <h1><i class="fas fa-archway"></i> 蚁巢空间评价体系计算器</h1>
             <p class="subtitle">输入您的蚁巢参数，系统将自动计算水塔类和空间类评价指标，并提供相对化评估结果</p>
         </header>
         
@@ -630,10 +636,10 @@
                 </div>
                 
                 <div class="input-group">
-                    <label for="minNestArea"><i class="fas fa-vector-square"></i> 最小巢室投影面积 (cm²)</label>
-                    <input type="number" id="minNestArea" placeholder="输入最小巢室投影面积" value="5">
+                    <label for="minMoistNestArea"><i class="fas fa-vector-square"></i> 最小保湿巢室投影面积 (cm²)</label>
+                    <input type="number" id="minMoistNestArea" placeholder="输入最小保湿巢室投影面积" value="5" class="important-input">
                     <div class="info-tooltip">
-                        <i class="fas fa-info-circle"></i> 投影面积指不计算墙体表面积，只计算水平表面积或圆形下50%部分的表面积
+                        <i class="fas fa-info-circle"></i> 最小的能提供保湿功能的与外界相通的巢室投影面积
                     </div>
                 </div>
                 
@@ -768,7 +774,7 @@
                     </div>
                     <div class="result-value" id="minAnts">33</div>
                     <div class="result-description">
-                        计算公式：最小巢室面积 / (蚂蚁长度 × 宽度 × 5)
+                        计算公式：最小保湿巢室面积 / (蚂蚁长度 × 宽度 × 5)
                         <p>巢室能容纳的最小蚂蚁数量</p>
                     </div>
                     <div class="evaluation-badge">中等</div>
@@ -799,10 +805,10 @@
             
             <div class="signature">
                 <div class="signature-item">
-                    <i class="fas fa-laptop-code"></i> HMTL编码：DeepSeek-R1
+                    <i class="fas fa-laptop-code"></i> css代码：DeepSeek-R1
                 </div>
                 <div class="signature-item">
-                    <i class="fas fa-bone"></i>算法参数及修bug：头盖骨收获蚁
+                    <i class="fas fa-bone"></i> debug及计算设计：头盖骨收获蚁
                 </div>
             </div>
             
@@ -944,7 +950,7 @@
             const activityArea = parseFloat(document.getElementById('activityArea').value) || 0;
             const nestArea = parseFloat(document.getElementById('nestArea').value) || 1;
             const minPassageWidth = parseFloat(document.getElementById('minPassageWidth').value) || 0;
-            const minNestArea = parseFloat(document.getElementById('minNestArea').value) || 0;
+            const minMoistNestArea = parseFloat(document.getElementById('minMoistNestArea').value) || 0;
             const antLength = parseFloat(document.getElementById('antLength').value) || 0.1;
             const antWidth = parseFloat(document.getElementById('antWidth').value) || 0.1;
             const totalNestArea = parseFloat(document.getElementById('totalNestArea').value) || 0;
@@ -958,7 +964,7 @@
             document.getElementById('passageWidth').textContent = minPassageWidth.toFixed(2) + ' cm';
             
             // 3. 最小建议入住数
-            const minAnts = minNestArea / (antLength * antWidth * 5);
+            const minAnts = minMoistNestArea / (antLength * antWidth * 5);
             document.getElementById('minAnts').textContent = Math.floor(minAnts);
             
             // 4. 巢室容量
