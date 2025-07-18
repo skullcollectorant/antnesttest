@@ -17,6 +17,7 @@
             --light-yellow: #FFF9C4;
             --bone-white: #F5F5F5;
             --shadow: 0 10px 30px rgba(0,0,0,0.15);
+            --error-red: #e53935;
         }
         
         * {
@@ -64,7 +65,6 @@
             text-align: center;
             color: var(--dark-brown);
             font-size: 1.1rem;
-            box-shadow: var(--shadow);
             position: relative;
         }
         
@@ -245,6 +245,18 @@
             box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
         }
         
+        .input-group input.error {
+            border-color: var(--error-red);
+            background-color: rgba(229, 57, 53, 0.1);
+        }
+        
+        .error-message {
+            color: var(--error-red);
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
         .checkbox-group {
             display: flex;
             align-items: center;
@@ -312,6 +324,16 @@
             background: linear-gradient(to right, var(--deep-green), var(--earth-brown));
         }
         
+        .btn-calculate.pulse {
+            animation: pulse 0.5s ease;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
         .info-tooltip {
             font-size: 0.9rem;
             color: var(--dark-brown);
@@ -346,6 +368,10 @@
             margin-top: 30px;
             border: 2px solid var(--earth-brown);
             position: relative;
+            display: block; /* 默认显示 */
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.8s ease-out;
         }
         
         .results-container {
@@ -385,6 +411,17 @@
             text-align: center;
             margin: 15px 0;
             color: var(--deep-green);
+            transition: all 0.3s;
+        }
+        
+        .result-value.highlight {
+            animation: highlight 1s ease;
+        }
+        
+        @keyframes highlight {
+            0% { color: var(--deep-green); transform: scale(1); }
+            50% { color: var(--earth-brown); transform: scale(1.1); }
+            100% { color: var(--deep-green); transform: scale(1); }
         }
         
         .result-description {
@@ -540,24 +577,20 @@
                 <div class="input-group">
                     <label for="moistureArea"><i class="fas fa-ruler-combined"></i> 保湿区面积 (cm²)</label>
                     <input type="number" id="moistureArea" placeholder="输入保湿区面积" value="150">
+                    <div class="error-message" id="moistureAreaError">保湿区面积不能大于总巢室内表面积</div>
                 </div>
                 
                 <div class="input-group">
-                    <label for="totalArea"><i class="fas fa-border-all"></i> 总面积 (cm²)</label>
-                    <input type="number" id="totalArea" placeholder="输入总面积" value="200">
+                    <label for="totalInternalArea"><i class="fas fa-border-all"></i> 总巢室内表面积 (cm²)</label>
+                    <input type="number" id="totalInternalArea" placeholder="输入总巢室内表面积" value="200">
+                    <div class="info-tooltip">
+                        <i class="fas fa-info-circle"></i> 总巢室内表面积包括所有巢室和通道的内表面积
+                    </div>
                 </div>
                 
                 <div class="input-group">
                     <label for="ventilationArea"><i class="fas fa-wind"></i> 通风面积 (cm²)</label>
                     <input type="number" id="ventilationArea" placeholder="输入通风面积" value="15">
-                </div>
-                
-                <div class="input-group">
-                    <label for="projectionArea"><i class="fas fa-crop-alt"></i> 总投影表面积 (cm²)</label>
-                    <input type="number" id="projectionArea" placeholder="输入总投影表面积" value="200">
-                    <div class="info-tooltip">
-                        <i class="fas fa-info-circle"></i> 投影面积指不计算墙体表面积，只计算水平表面积或圆形下50%部分的表面积
-                    </div>
                 </div>
                 
                 <div class="input-group">
@@ -621,13 +654,13 @@
             
             <div class="input-grid">
                 <div class="input-group">
-                    <label for="activityArea"><i class="fas fa-running"></i> 活动区面积 (cm²)</label>
-                    <input type="number" id="activityArea" placeholder="输入活动区面积" value="300">
+                    <label for="activityArea"><i class="fas fa-running"></i> 活动区投影面积 (cm²)</label>
+                    <input type="number" id="activityArea" placeholder="输入活动区投影面积" value="300">
                 </div>
                 
                 <div class="input-group">
-                    <label for="nestArea"><i class="fas fa-home"></i> 巢区面积 (cm²)</label>
-                    <input type="number" id="nestArea" placeholder="输入巢区面积" value="200">
+                    <label for="nestArea"><i class="fas fa-home"></i> 巢区投影面积 (cm²)</label>
+                    <input type="number" id="nestArea" placeholder="输入巢区投影面积" value="200">
                 </div>
                 
                 <div class="input-group">
@@ -641,6 +674,7 @@
                     <div class="info-tooltip">
                         <i class="fas fa-info-circle"></i> 最小的能提供保湿功能的与外界相通的巢室投影面积
                     </div>
+                    <div class="error-message" id="minMoistNestAreaError">最小保湿巢室投影面积不能大于总巢室内表面积</div>
                 </div>
                 
                 <div class="input-group">
@@ -652,11 +686,6 @@
                     <label for="antWidth"><i class="fas fa-ruler-vertical"></i> 蚂蚁宽度 (cm)</label>
                     <input type="number" id="antWidth" placeholder="输入蚂蚁宽度" value="0.3" step="0.1">
                 </div>
-                
-                <div class="input-group">
-                    <label for="totalNestArea"><i class="fas fa-border-style"></i> 巢室总面积 (cm²)</label>
-                    <input type="number" id="totalNestArea" placeholder="输入巢室总面积" value="150">
-                </div>
             </div>
         </div>
         
@@ -664,7 +693,7 @@
             <i class="fas fa-calculator"></i> 计算蚁巢评价结果
         </button>
         
-        <div class="results-section">
+        <div class="results-section" id="results-section">
             <div class="category-header">
                 <i class="fas fa-tint"></i> 水塔类评价结果
             </div>
@@ -676,7 +705,7 @@
                     </div>
                     <div class="result-value" id="wsResult">0.75</div>
                     <div class="result-description">
-                        计算公式：Ws = 保湿区面积 / 总面积 (cm²/cm²)
+                        计算公式：Ws = 保湿区面积 / 总巢室内表面积 (cm²/cm²)
                         <p>值越高表示保湿能力越强</p>
                     </div>
                     <div class="evaluation-badge">良好</div>
@@ -691,7 +720,7 @@
                     </div>
                     <div class="result-value" id="kResult">0.20</div>
                     <div class="result-description">
-                        计算公式：K = (A/S * 系数) * 1000 + 0.2
+                        计算公式：K = (通风面积 / 总巢室内表面积 × 系数) × 1000 + 0.2
                         <p>反映水塔通风能力</p>
                     </div>
                     <div class="evaluation-badge">低</div>
@@ -706,7 +735,7 @@
                     </div>
                     <div class="result-value" id="wtResult">12.50 cm</div>
                     <div class="result-description">
-                        计算公式：Wt = V水箱 / (S面积 × K)
+                        计算公式：Wt = 水箱体积 / (总巢室内表面积 × K)
                         <p>值越高表示保湿时间越长</p>
                     </div>
                     <div class="evaluation-badge">优秀</div>
@@ -744,7 +773,7 @@
                     </div>
                     <div class="result-value" id="activityRatio">1.50</div>
                     <div class="result-description">
-                        计算公式：活动区面积 / 巢区面积 (cm²/cm²)
+                        计算公式：活动区投影面积 / 巢区投影面积 (cm²/cm²)
                         <p>反映活动空间与巢室空间的比例关系</p>
                     </div>
                     <div class="evaluation-badge">优秀</div>
@@ -789,7 +818,7 @@
                     </div>
                     <div class="result-value" id="capacity">500</div>
                     <div class="result-description">
-                        计算公式：巢室总面积 / (蚂蚁长度 × 宽度 × F)
+                        计算公式：总巢室内表面积 / (蚂蚁长度 × 宽度 × F)
                         <p>根据蚂蚁尺寸计算的巢室总容量</p>
                     </div>
                     <div class="evaluation-badge">充足</div>
@@ -822,66 +851,143 @@
     </div>
     
     <script>
-        // 标签切换功能
-        document.querySelectorAll('.tab-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                // 移除所有标签的活动状态
-                document.querySelectorAll('.tab-btn').forEach(btn => {
-                    btn.classList.remove('active');
+        // 确保在DOM完全加载后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始选择无通风口
+            document.querySelector('.ventilation-option[data-type="none"]').classList.add('selected');
+            
+            // 标签切换功能
+            document.querySelectorAll('.tab-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    // 移除所有标签的活动状态
+                    document.querySelectorAll('.tab-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // 隐藏所有标签内容
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // 激活当前标签
+                    button.classList.add('active');
+                    const tabId = button.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
                 });
-                
-                // 隐藏所有标签内容
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                
-                // 激活当前标签
-                button.classList.add('active');
-                const tabId = button.getAttribute('data-tab');
-                document.getElementById(`${tabId}-tab`).classList.add('active');
             });
+            
+            // 通风类型选择功能
+            document.querySelectorAll('.ventilation-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const type = this.getAttribute('data-type');
+                    
+                    // 移除所有选择
+                    document.querySelectorAll('.ventilation-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // 添加当前选择
+                    this.classList.add('selected');
+                    
+                    // 设置对应的radio为选中
+                    const radio = this.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    
+                    // 更新铁丝网选项状态
+                    const wireMeshCheckbox = document.getElementById('wireMesh');
+                    if (type === 'none') {
+                        wireMeshCheckbox.disabled = true;
+                        wireMeshCheckbox.checked = false;
+                    } else {
+                        wireMeshCheckbox.disabled = false;
+                    }
+                    
+                    // 输入变化时重新计算
+                    calculateResults();
+                });
+            });
+            
+            // 计算结果功能
+            document.getElementById('calculateBtn').addEventListener('click', function() {
+                // 添加按钮动画
+                this.classList.add('pulse');
+                setTimeout(() => this.classList.remove('pulse'), 500);
+                
+                calculateResults();
+                
+                // 滚动到结果区域
+                setTimeout(() => {
+                    const resultsSection = document.getElementById('results-section');
+                    resultsSection.scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }, 100);
+            });
+            
+            // 输入验证
+            document.getElementById('moistureArea').addEventListener('input', validateMoistureArea);
+            document.getElementById('minMoistNestArea').addEventListener('input', validateMinMoistNestArea);
+            
+            // 添加所有输入框的输入事件监听
+            const inputs = document.querySelectorAll('input[type="number"], input[type="checkbox"]');
+            inputs.forEach(input => {
+                input.addEventListener('input', calculateResults);
+            });
+            
+            // 初始计算
+            calculateResults();
         });
         
-        // 通风类型选择功能
-        document.querySelectorAll('.ventilation-option').forEach(option => {
-            option.addEventListener('click', function() {
-                const type = this.getAttribute('data-type');
-                
-                // 移除所有选择
-                document.querySelectorAll('.ventilation-option').forEach(opt => {
-                    opt.classList.remove('selected');
-                });
-                
-                // 添加当前选择
-                this.classList.add('selected');
-                
-                // 设置对应的radio为选中
-                const radio = this.querySelector('input[type="radio"]');
-                radio.checked = true;
-                
-                // 更新铁丝网选项状态
-                const wireMeshCheckbox = document.getElementById('wireMesh');
-                if (type === 'none') {
-                    wireMeshCheckbox.disabled = true;
-                    wireMeshCheckbox.checked = false;
-                } else {
-                    wireMeshCheckbox.disabled = false;
-                }
-            });
-        });
+        function validateMoistureArea() {
+            const moistureArea = parseFloat(document.getElementById('moistureArea').value) || 0;
+            const totalInternalArea = parseFloat(document.getElementById('totalInternalArea').value) || 0;
+            const errorElement = document.getElementById('moistureAreaError');
+            const inputElement = document.getElementById('moistureArea');
+            
+            if (moistureArea > totalInternalArea) {
+                errorElement.style.display = 'block';
+                inputElement.classList.add('error');
+                return false;
+            } else {
+                errorElement.style.display = 'none';
+                inputElement.classList.remove('error');
+                return true;
+            }
+        }
         
-        // 初始选择无通风口
-        document.querySelector('.ventilation-option[data-type="none"]').classList.add('selected');
-        
-        // 计算结果功能
-        document.getElementById('calculateBtn').addEventListener('click', calculateResults);
+        function validateMinMoistNestArea() {
+            const minMoistNestArea = parseFloat(document.getElementById('minMoistNestArea').value) || 0;
+            const totalInternalArea = parseFloat(document.getElementById('totalInternalArea').value) || 0;
+            const errorElement = document.getElementById('minMoistNestAreaError');
+            const inputElement = document.getElementById('minMoistNestArea');
+            
+            if (minMoistNestArea > totalInternalArea) {
+                errorElement.style.display = 'block';
+                inputElement.classList.add('error');
+                return false;
+            } else {
+                errorElement.style.display = 'none';
+                inputElement.classList.remove('error');
+                return true;
+            }
+        }
         
         function calculateResults() {
+            console.log("计算函数被调用");
+            
+            // 验证输入
+            const moistureValid = validateMoistureArea();
+            const minMoistValid = validateMinMoistNestArea();
+            
+            if (!moistureValid || !minMoistValid) {
+                return;
+            }
+            
             // 获取水塔类参数
             const moistureArea = parseFloat(document.getElementById('moistureArea').value) || 0;
-            const totalArea = parseFloat(document.getElementById('totalArea').value) || 1;
+            const totalInternalArea = parseFloat(document.getElementById('totalInternalArea').value) || 1;
             const ventilationArea = parseFloat(document.getElementById('ventilationArea').value) || 0;
-            const projectionArea = parseFloat(document.getElementById('projectionArea').value) || 1;
             const waterVolume = parseFloat(document.getElementById('waterVolume').value) || 0;
             const isReplaceable = document.getElementById('replaceable').checked;
             const hasSilicone = document.getElementById('silicone').checked;
@@ -893,11 +999,13 @@
             
             // 计算水塔类指标
             // 1. 保湿强度 (Ws)
-            const ws = moistureArea / totalArea;
+            const ws = moistureArea / totalInternalArea;
             document.getElementById('wsResult').textContent = ws.toFixed(2);
+            document.getElementById('wsResult').classList.add('highlight');
+            setTimeout(() => document.getElementById('wsResult').classList.remove('highlight'), 1000);
             
             // 2. 通风度常数 (K)
-            let kb = ventilationArea / projectionArea;
+            let kb = ventilationArea / totalInternalArea;
             let adjustmentFactor = 1;
             
             // 通风方向系数
@@ -916,10 +1024,14 @@
             
             const k = ventilationType === 'none' ? 0.2 : (kb * adjustmentFactor * 1000) + 0.2;
             document.getElementById('kResult').textContent = k.toFixed(2);
+            document.getElementById('kResult').classList.add('highlight');
+            setTimeout(() => document.getElementById('kResult').classList.remove('highlight'), 1000);
             
             // 3. 保湿持久度 (Wt)
-            const wt = waterVolume / (projectionArea * k) || 0;
+            const wt = waterVolume / (totalInternalArea * k) || 0;
             document.getElementById('wtResult').textContent = wt.toFixed(2) + ' cm';
+            document.getElementById('wtResult').classList.add('highlight');
+            setTimeout(() => document.getElementById('wtResult').classList.remove('highlight'), 1000);
             
             // 4. 维护简易度
             const baseMaintenance = 75;
@@ -943,8 +1055,8 @@
             
             const maintenanceScore = baseMaintenance + bonus;
             document.getElementById('maintenanceResult').textContent = maintenanceScore + ' 分';
-            document.querySelector('.result-card .result-description').innerHTML = 
-                `<p>基础评分：75分 + 加分项</p>${bonusHtml}`;
+            document.getElementById('maintenanceResult').classList.add('highlight');
+            setTimeout(() => document.getElementById('maintenanceResult').classList.remove('highlight'), 1000);
             
             // 获取空间类参数
             const activityArea = parseFloat(document.getElementById('activityArea').value) || 0;
@@ -953,28 +1065,35 @@
             const minMoistNestArea = parseFloat(document.getElementById('minMoistNestArea').value) || 0;
             const antLength = parseFloat(document.getElementById('antLength').value) || 0.1;
             const antWidth = parseFloat(document.getElementById('antWidth').value) || 0.1;
-            const totalNestArea = parseFloat(document.getElementById('totalNestArea').value) || 0;
             
             // 计算空间类指标
             // 1. 巢区活动区比例
             const activityRatio = activityArea / nestArea;
             document.getElementById('activityRatio').textContent = activityRatio.toFixed(2);
+            document.getElementById('activityRatio').classList.add('highlight');
+            setTimeout(() => document.getElementById('activityRatio').classList.remove('highlight'), 1000);
             
             // 2. 最小通道宽度
             document.getElementById('passageWidth').textContent = minPassageWidth.toFixed(2) + ' cm';
+            document.getElementById('passageWidth').classList.add('highlight');
+            setTimeout(() => document.getElementById('passageWidth').classList.remove('highlight'), 1000);
             
             // 3. 最小建议入住数
             const minAnts = minMoistNestArea / (antLength * antWidth * 5);
             document.getElementById('minAnts').textContent = Math.floor(minAnts);
+            document.getElementById('minAnts').classList.add('highlight');
+            setTimeout(() => document.getElementById('minAnts').classList.remove('highlight'), 1000);
             
-            // 4. 巢室容量
+            // 4. 巢室容量 (使用总巢室内表面积计算)
             let fFactor = 0.3;
             if (antLength >= 0.5 && antLength < 1.2) fFactor = 0.7;
             else if (antLength >= 1.2 && antLength < 2) fFactor = 1;
             else if (antLength >= 2 && antLength < 4.2) fFactor = 1.5;
             
-            const capacity = totalNestArea / (antLength * antWidth * fFactor);
+            const capacity = totalInternalArea / (antLength * antWidth * fFactor);
             document.getElementById('capacity').textContent = Math.floor(capacity);
+            document.getElementById('capacity').classList.add('highlight');
+            setTimeout(() => document.getElementById('capacity').classList.remove('highlight'), 1000);
             
             // 更新评价徽章
             updateEvaluationBadges(ws, k, wt, activityRatio, minPassageWidth, minAnts, capacity);
@@ -1045,9 +1164,6 @@
                 }
             });
         }
-        
-        // 初始计算
-        calculateResults();
     </script>
 </body>
 </html>
